@@ -3,7 +3,7 @@ from Tile import Tile
 
 class KonaneGame:
     def __init__(self):
-        NotImplemented
+        pass
 
     def initialize_board(self, board_size):
         board = []
@@ -86,7 +86,7 @@ class KonaneGame:
         if board.contains(r + factor * rd, c + factor * cd, opponent) and \
                 board.contains(r + (factor + 1) * rd, c + (factor + 1) * cd, Tile.P_NONE):
             return [[r, c, r + (factor + 1) * rd, c + (factor + 1) * cd]] + \
-                   self.check(board, r, c, rd, cd, factor + 2, opponent)
+                self.check(board, r, c, rd, cd, factor + 2, opponent)
         else:
             return []
 
@@ -119,14 +119,26 @@ class KonaneGame:
         """
         return Tile.P_Black if tile == Tile.P_White else Tile.P_White
 
+    def corner_pieces(self, board, color):
+        count = 0
+        for i in range(board.size):
+            if board.contains(0, i, color):
+                count += 3
+            if board.contains(board.size - 1, i, color):
+                count += 3
+            if board.contains(i, 0, color):
+                count += 3
+            if board.contains(i, board.size - 1, color):
+                count += 3
+        return count
+
     def evaluate(self, board, color, terminal_value=0):
-
         value = 0
-        valid_moves_color = self.generate_all_possible_moves(board, color)
-        valid_moves_opponent = self.generate_all_possible_moves(board, self.opponent(color))
+        count_moves_color = self.corner_pieces(board, color)
+        count_moves_opponent = self.corner_pieces(board, self.opponent(color))
 
-        value += (10 * len(valid_moves_color))
-        value -= (10 * len(valid_moves_opponent))
+        value += count_moves_color
+        value -= count_moves_opponent
 
         value += terminal_value
 
